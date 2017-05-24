@@ -355,7 +355,13 @@ void Draw_Numerator_pub(TString HISTO,TString XTITLE,float XMIN,float XMAX,bool 
       float syst_tot = std::sqrt( std::pow(std::abs(h_Tot_Sys_nominal->GetBinError(binno)),2) + // For norminal systematic uncertainties
                        std::pow(std::max(std::abs(theory_unc_up),std::abs(theory_unc_down)),2) + // For the theory uncertainty by Christian Gutschow
                        std::pow(std::abs(h_SM->GetBinError(binno)),2) // For MC statistical uncertainty
-                       );
+          );
+
+      cout << "bin # = " << binno << " N_Data = " << h_Data->GetBinContent(binno) << ", Data statistical uncertainty  = " << h_Data->GetBinError(binno) << endl;
+      cout << "bin # = " << binno << " N_MC_est = " << h_SM->GetBinContent(binno)  << ", MC statistical uncertainty  = " << h_SM->GetBinError(binno) << endl;
+      cout << "bin # = " << binno << " Ratio (Data/MC) statistical uncertainty  = " << h_Ratio->GetBinError(binno) << endl;
+      cout << "bin # = " << binno << " total error = " << syst_tot << endl;
+
       float syst_tot_frac = syst_tot / nominal;
       h_total_sys->SetBinError(binno, syst_tot);
       h_total_sys_frac->SetBinError(binno, syst_tot_frac);
@@ -449,14 +455,16 @@ void Draw_Numerator_pub(TString HISTO,TString XTITLE,float XMIN,float XMAX,bool 
       myText( 0.30, 0.79, 1, "#scale[0.8]{#sqrt{s} = 13 TeV,}");
       myText( 0.45, 0.79, 1, "#scale[0.8]{"+intLumi+"}");
       myText( 0.31, 0.74, 1, "#scale[0.8]{"+channel+"}");
-      //ATLASLabel(0.2,0.2,"Preliminary");
-      ATLASLabel(0.30,0.85,"Internal");
+      //ATLASLabel(0.30,0.85,"Internal");
+      //ATLASLabel(0.30,0.85,"Preliminary");
+      ATLASLabel(0.30,0.85,"");
     } else {
       myText( 0.40, 0.79, 1, "#scale[0.8]{#sqrt{s} = 13 TeV,}");
       myText( 0.55, 0.79, 1, "#scale[0.8]{"+intLumi+"}");
       myText( 0.40, 0.74, 1, "#scale[0.8]{"+channel+"}");
-      //ATLASLabel(0.2,0.2,"Preliminary");
       ATLASLabel(0.40,0.85,"Internal");
+      //ATLASLabel(0.40,0.85,"Preliminary");
+      //ATLASLabel(0.40,0.85,"");
     }
   }
 
@@ -497,7 +505,7 @@ void Draw_Numerator_pub(TString HISTO,TString XTITLE,float XMIN,float XMAX,bool 
   h_Ratio->SetMinimum(0.5);
   h_Ratio->SetMaximum(1.5);
   h_Ratio->GetYaxis()->SetTitle("Data / SM");
-  if (UNITS == "" || UNITS.Contains("rad")) {
+  if (UNITS == "") {
     h_Ratio->GetXaxis()->SetTitle(XTITLE);
   }
   else {

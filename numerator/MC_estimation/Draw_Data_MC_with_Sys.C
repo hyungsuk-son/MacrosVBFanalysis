@@ -31,7 +31,7 @@
 //#endif
 
 
-void Draw_Data_MC_with_Sys(TString HISTO,TString XTITLE,float XMIN,float XMAX,bool REBIN,bool LOGY,bool PRINT,int XDIV,TString UNITS,bool GeneratorSYS,bool TheorySYS,bool ATLAS,bool DivBinWidth)
+void Draw_Data_MC_with_Sys(TString HISTO,TString XTITLE,float XMIN,float XMAX,bool REBIN,bool LOGY,bool PRINT,int XDIV,TString UNITS,bool GeneratorSYS,bool TheorySYS,bool TopReweight,bool ATLAS,bool DivBinWidth)
 {
   gROOT->ForceStyle();
 
@@ -82,6 +82,7 @@ void Draw_Data_MC_with_Sys(TString HISTO,TString XTITLE,float XMIN,float XMAX,bo
   TFile *file_MCData = TFile::Open(PATH+filename_MCData);
   //TFile *file_Emily = TFile::Open(PATH+filename_Emily); // use the Emily histograms
   TFile *file_Sys = TFile::Open(PATH+filename_Sys);
+
 
   // Define Rebinning
   Double_t binsMET[] = {200.,250.,300.,350.,500.,700.,1400.};
@@ -400,6 +401,88 @@ void Draw_Data_MC_with_Sys(TString HISTO,TString XTITLE,float XMIN,float XMAX,bo
 
 
 
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // Top background re-weighting factor and systematics obtained by fitting the ratio Data/MC in the e-mu control region //
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // Retrieve top re-weighting histograms (from e-mu control region)
+  TH1F *h_emuData; // Data in the e-mu control region
+  TH1F *h_TopReweight; // re-weighting factor histogram
+  TH1F *h_TopSys; // re-weighting factor histogram
+  if (TopReweight) {
+    TString finename_TopReweight("hist_zemu_ttbar_unc.root");
+    TFile *file_TopReweight = TFile::Open(PATH+finename_TopReweight);
+    // Data
+    if ( HISTO.Contains("monojet_met") ) h_emuData = (TH1F*)file_TopReweight->Get("Data_MET_mono");
+    if ( HISTO.Contains("vbf_met") ) h_emuData = (TH1F*)file_TopReweight->Get("Data_MET_search");
+    if ( HISTO.Contains("vbf_mjj") ) h_emuData = (TH1F*)file_TopReweight->Get("Data_Mjj_search");
+    if ( HISTO.Contains("vbf_dPhijj") ) h_emuData = (TH1F*)file_TopReweight->Get("Data_DeltaPhiAll");
+    // Re-weighting histogram
+    if ( HISTO.Contains("monojet_met") ) h_TopReweight = (TH1F*)file_TopReweight->Get("Fit_Nominal_MET_mono");
+    if ( HISTO.Contains("vbf_met") ) h_TopReweight = (TH1F*)file_TopReweight->Get("Fit_Nominal_MET_search");
+    if ( HISTO.Contains("vbf_mjj") ) h_TopReweight = (TH1F*)file_TopReweight->Get("Fit_Nominal_Mjj_search");
+    if ( HISTO.Contains("vbf_dPhijj") ) h_TopReweight = (TH1F*)file_TopReweight->Get("Fit_Nominal_DeltaPhiAll");
+    // Rebin
+    if (REBIN && HISTO.Contains("met")) h_emuData = dynamic_cast<TH1F*>(h_emuData->Rebin(nbinMET,"h_emuData",binsMET));
+    if (REBIN && HISTO.Contains("mjj")) h_emuData = dynamic_cast<TH1F*>(h_emuData->Rebin(nbinMjj,"h_emuData",binsMjj));
+    if (REBIN && HISTO.Contains("met")) h_TopReweight = dynamic_cast<TH1F*>(h_TopReweight->Rebin(nbinMET,"h_TopReweight",binsMET));
+    if (REBIN && HISTO.Contains("mjj")) h_TopReweight = dynamic_cast<TH1F*>(h_TopReweight->Rebin(nbinMjj,"h_TopReweight",binsMjj));
+
+    // Re-weight top background by fitting histogram and obtain the systematic from the difference between unreweighted and reweighted top bkg
+    float reweight_factor = 0.;
+    h_TopSys = (TH1F*)h_TopReweight->Clone("h_TopSys");
+    h_TopSys->Reset();
+    for (int binno = 0; binno < h_TopReweight->GetNbinsX() + 2; ++binno) {
+      // In bins where there is not sufficient data, the value of the reweighting function from the last bin with enough is used
+      if (h_emuData->GetBinContent(binno) > 3) reweight_factor = h_TopReweight->GetBinContent(binno);
+      //cout << "bin # = " << binno << " reweighting factor = " << reweight_factor << endl;
+      float content_ttbar = h_ttbar->GetBinContent(binno);
+      float reweighted_ttbar = content_ttbar * reweight_factor;
+      h_ttbar->SetBinContent(binno, reweighted_ttbar);
+      h_ttbar->SetBinError(binno, h_ttbar->GetBinError(binno) * reweight_factor);
+      // The difference between unreweighted and reweighted top bkg
+      float diff = std::abs(content_ttbar - reweighted_ttbar);
+      //cout << "bin # = " << binno << " The difference between unreweighted and reweighted top bkg = " << diff << endl;
+      h_TopSys->SetBinContent(binno, diff);
+    }
+
+
+    // Recalculate SM for Zmumu or Zee
+    if ( HISTO.Contains("mumu") || HISTO.Contains("ee") ) {
+      h_SM->Reset();
+      h_SM->Add(h_Zmumu);
+      h_SM->Add(h_Zee);
+      h_SM->Add(h_Multijet);
+      h_SM->Add(h_Znunu);
+      h_SM->Add(h_Ztautau);
+      h_SM->Add(h_Wtaunu);
+      h_SM->Add(h_Wmunu);
+      h_SM->Add(h_Wenu);
+      h_SM->Add(h_Diboson);
+      h_SM->Add(h_ttbar);
+    }
+
+    // Recalcualte SM for Zll
+    if ( HISTO.Contains("zll") ){
+      h_SM->Reset();
+      h_SM->Add(h_Zll);
+      h_SM->Add(h_Multijet);
+      h_SM->Add(h_Znunu);
+      h_SM->Add(h_Ztautau);
+      h_SM->Add(h_Wlnu);
+      h_SM->Add(h_Diboson);
+      h_SM->Add(h_ttbar);
+    }
+
+
+  } // TopReweight End
+
+
+
+
+
+
+
+
   // Dividing by bin width as we are more used to in “measurement” papers
   if (DivBinWidth) {
 
@@ -427,6 +510,9 @@ void Draw_Data_MC_with_Sys(TString HISTO,TString XTITLE,float XMIN,float XMAX,bo
       for (sys = systematics.begin(); sys != systematics.end(); sys++){
         TString sys_name = *sys;
         h_background_sys[sys_name]->SetBinContent(binno, h_background_sys[sys_name]->GetBinContent(binno)/h_background_sys[sys_name]->GetBinWidth(binno));
+      }
+      if (TopReweight) {
+        h_TopSys->SetBinContent(binno, h_TopSys->GetBinContent(binno)/h_TopSys->GetBinWidth(binno));
       }
 
       // Scale Errors
@@ -655,7 +741,16 @@ void Draw_Data_MC_with_Sys(TString HISTO,TString XTITLE,float XMIN,float XMAX,bo
     }
 
 
-  }
+  } //TheorySys End
+
+
+
+
+
+
+
+
+
 
 
   // Define Stack
@@ -796,7 +891,6 @@ void Draw_Data_MC_with_Sys(TString HISTO,TString XTITLE,float XMIN,float XMAX,bo
 
 
 
-
   //////////////////////////////////
   // Total systematic uncertainty //
   //////////////////////////////////
@@ -824,12 +918,16 @@ void Draw_Data_MC_with_Sys(TString HISTO,TString XTITLE,float XMIN,float XMAX,bo
       float nominal = h_background_sys[""]->GetBinContent(binno);
       float generator_unc = 0.; // Calculate the generator uncertainty (my method)
       float theory_unc = 0.; // Calculate the theory uncertainty (Christian Gutschow)
+      float top_unc = 0.; // Calculate the top background uncertainty from the e-mu control region
       if (HISTO.Contains("zee") || HISTO.Contains("zmumu") || HISTO.Contains("zll") ) { // Truth histograms exist only in Zee, Zmumu and Zll at this time
         if ( GeneratorSYS ) { // Calculate the generator uncertainty from my method (fitting)
           generator_unc = h_Fit_MGPy8EG_Sherpa->GetBinContent(binno) * nominal;
         }
         if ( TheorySYS ) { // Calculate the generator uncertainty by Christian Gutschow
           theory_unc = h_manual_frac_uncertain->GetBinContent(binno) * nominal;
+        }
+        if ( TopReweight ) {
+          top_unc = h_TopSys->GetBinContent(binno);
         }
       }
       float syst_tot = std::sqrt( std::pow(std::max(std::abs(h_background_sys["EG_RESOLUTION_ALL__1down"]->GetBinContent(binno)-nominal),std::abs(h_background_sys["EG_RESOLUTION_ALL__1up"]->GetBinContent(binno)-nominal)),2) +
@@ -864,6 +962,7 @@ void Draw_Data_MC_with_Sys(TString HISTO,TString XTITLE,float XMIN,float XMAX,bo
           //std::pow(std::max(std::abs(h_background_sys["PRW_DATASF__1down"]->GetBinContent(binno)-nominal),std::abs(h_background_sys["PRW_DATASF__1up"]->GetBinContent(binno)-nominal)),2) + // commented out asked by Prof. Beauchemin
           std::pow(std::abs(generator_unc),2) + // For generator uncertainty by my method
           std::pow(std::abs(theory_unc),2) + // For theory uncertainty by Christian Gutschow
+          std::pow(top_unc,2) + // Difference between unreweighted and reweighted top background
           std::pow(std::abs(h_SM->GetBinError(binno)),2)  // For MC statistical uncertainty
           );
         cout << "bin # = " << binno << " N_Data = " << h_Data->GetBinContent(binno) << ", Data statistical uncertainty  = " << h_Data->GetBinError(binno) << endl;
@@ -976,14 +1075,16 @@ void Draw_Data_MC_with_Sys(TString HISTO,TString XTITLE,float XMIN,float XMAX,bo
       myText( 0.33, 0.79, 1, "#scale[0.8]{#sqrt{s} = 13 TeV,}");
       myText( 0.48, 0.79, 1, "#scale[0.8]{"+intLumi+"}");
       myText( 0.33, 0.74, 1, "#scale[0.8]{"+channel+"}");
-      //ATLASLabel(0.2,0.2,"Preliminary");
-      ATLASLabel(0.33,0.85,"Internal");
+      //ATLASLabel(0.33,0.85,"Internal");
+      //ATLASLabel(0.33,0.85,"Preliminary");
+      ATLASLabel(0.33,0.85,"");
     } else {
       myText( 0.38, 0.79, 1, "#scale[0.8]{#sqrt{s} = 13 TeV,}");
       myText( 0.53, 0.79, 1, "#scale[0.8]{"+intLumi+"}");
       myText( 0.38, 0.74, 1, "#scale[0.8]{"+channel+"}");
-      //ATLASLabel(0.2,0.2,"Preliminary");
-      ATLASLabel(0.38,0.85,"Internal");
+      //ATLASLabel(0.38,0.85,"Internal");
+      //ATLASLabel(0.33,0.85,"Preliminary");
+      ATLASLabel(0.38,0.85,"");
     }
   }
 
@@ -1050,7 +1151,7 @@ void Draw_Data_MC_with_Sys(TString HISTO,TString XTITLE,float XMIN,float XMAX,bo
   h_Ratio->SetMinimum(0.5);
   h_Ratio->SetMaximum(1.5);
   h_Ratio->GetYaxis()->SetTitle("Data / SM");
-  if (UNITS == "" || UNITS.Contains("rad")) {
+  if (UNITS == "") {
     h_Ratio->GetXaxis()->SetTitle(XTITLE);
   }
   else {

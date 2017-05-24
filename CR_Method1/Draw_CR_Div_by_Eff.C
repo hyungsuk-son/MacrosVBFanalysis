@@ -309,14 +309,16 @@ void Draw_CR_Div_by_Eff(TString HISTO,TString XTITLE,float XMIN,float XMAX,bool 
       myText( 0.30, 0.79, 1, "#scale[0.8]{#sqrt{s} = 13 TeV,}");
       myText( 0.45, 0.79, 1, "#scale[0.8]{"+intLumi+"}");
       myText( 0.31, 0.74, 1, "#scale[0.8]{"+channel+"}");
-      //ATLASLabel(0.2,0.2,"Preliminary");
-      ATLASLabel(0.30,0.85,"Internal");
+      //ATLASLabel(0.30,0.85,"Internal");
+      //ATLASLabel(0.30,0.85,"Preliminary");
+      ATLASLabel(0.30,0.85,"");
     } else {
       myText( 0.40, 0.79, 1, "#scale[0.8]{#sqrt{s} = 13 TeV,}");
       myText( 0.55, 0.79, 1, "#scale[0.8]{"+intLumi+"}");
       myText( 0.40, 0.74, 1, "#scale[0.8]{"+channel+"}");
-      //ATLASLabel(0.2,0.2,"Preliminary");
-      ATLASLabel(0.40,0.85,"Internal");
+      //ATLASLabel(0.40,0.85,"Internal");
+      //ATLASLabel(0.40,0.85,"Preliminary");
+      ATLASLabel(0.40,0.85,"");
     }
   }
 

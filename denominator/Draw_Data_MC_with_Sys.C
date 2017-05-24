@@ -434,12 +434,14 @@ void Draw_Data_MC_with_Sys(TString HISTO,TString XTITLE,float XMIN,float XMAX,bo
     for (int binno = 0; binno < h_TopReweight->GetNbinsX() + 2; ++binno) {
       // In bins where there is not sufficient data, the value of the reweighting function from the last bin with enough is used
       if (h_emuData->GetBinContent(binno) > 3) reweight_factor = h_TopReweight->GetBinContent(binno);
+      //cout << "bin # = " << binno << " reweighting factor = " << reweight_factor << endl;
       float content_ttbar = h_ttbar->GetBinContent(binno);
       float reweighted_ttbar = content_ttbar * reweight_factor;
       h_ttbar->SetBinContent(binno, reweighted_ttbar);
       h_ttbar->SetBinError(binno, h_ttbar->GetBinError(binno) * reweight_factor);
       // The difference between unreweighted and reweighted top bkg
       float diff = std::abs(content_ttbar - reweighted_ttbar);
+      //cout << "bin # = " << binno << " The difference between unreweighted and reweighted top bkg = " << diff << endl;
       h_TopSys->SetBinContent(binno, diff);
     }
 
@@ -1073,14 +1075,16 @@ void Draw_Data_MC_with_Sys(TString HISTO,TString XTITLE,float XMIN,float XMAX,bo
       myText( 0.33, 0.79, 1, "#scale[0.8]{#sqrt{s} = 13 TeV,}");
       myText( 0.48, 0.79, 1, "#scale[0.8]{"+intLumi+"}");
       myText( 0.33, 0.74, 1, "#scale[0.8]{"+channel+"}");
-      //ATLASLabel(0.2,0.2,"Preliminary");
-      ATLASLabel(0.33,0.85,"Internal");
+      //ATLASLabel(0.33,0.85,"Internal");
+      //ATLASLabel(0.33,0.85,"Preliminary");
+      ATLASLabel(0.33,0.85,"");
     } else {
       myText( 0.38, 0.79, 1, "#scale[0.8]{#sqrt{s} = 13 TeV,}");
       myText( 0.53, 0.79, 1, "#scale[0.8]{"+intLumi+"}");
       myText( 0.38, 0.74, 1, "#scale[0.8]{"+channel+"}");
-      //ATLASLabel(0.2,0.2,"Preliminary");
-      ATLASLabel(0.38,0.85,"Internal");
+      //ATLASLabel(0.38,0.85,"Internal");
+      //ATLASLabel(0.33,0.85,"Preliminary");
+      ATLASLabel(0.38,0.85,"");
     }
   }
 
@@ -1147,7 +1151,7 @@ void Draw_Data_MC_with_Sys(TString HISTO,TString XTITLE,float XMIN,float XMAX,bo
   h_Ratio->SetMinimum(0.5);
   h_Ratio->SetMaximum(1.5);
   h_Ratio->GetYaxis()->SetTitle("Data / SM");
-  if (UNITS == "" || UNITS.Contains("rad")) {
+  if (UNITS == "") {
     h_Ratio->GetXaxis()->SetTitle(XTITLE);
   }
   else {

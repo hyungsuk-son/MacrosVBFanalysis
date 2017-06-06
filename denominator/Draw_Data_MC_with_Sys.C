@@ -1075,16 +1075,16 @@ void Draw_Data_MC_with_Sys(TString HISTO,TString XTITLE,float XMIN,float XMAX,bo
       myText( 0.33, 0.79, 1, "#scale[0.8]{#sqrt{s} = 13 TeV,}");
       myText( 0.48, 0.79, 1, "#scale[0.8]{"+intLumi+"}");
       myText( 0.33, 0.74, 1, "#scale[0.8]{"+channel+"}");
-      //ATLASLabel(0.33,0.85,"Internal");
-      //ATLASLabel(0.33,0.85,"Preliminary");
-      ATLASLabel(0.33,0.85,"");
+      //ATLASLabel(0.33,0.84,"Internal");
+      //ATLASLabel(0.33,0.84,"Preliminary");
+      ATLASLabel(0.33,0.84,"");
     } else {
       myText( 0.38, 0.79, 1, "#scale[0.8]{#sqrt{s} = 13 TeV,}");
       myText( 0.53, 0.79, 1, "#scale[0.8]{"+intLumi+"}");
       myText( 0.38, 0.74, 1, "#scale[0.8]{"+channel+"}");
-      //ATLASLabel(0.38,0.85,"Internal");
-      //ATLASLabel(0.33,0.85,"Preliminary");
-      ATLASLabel(0.38,0.85,"");
+      //ATLASLabel(0.38,0.84,"Internal");
+      //ATLASLabel(0.38,0.84,"Preliminary");
+      ATLASLabel(0.38,0.84,"");
     }
   }
 

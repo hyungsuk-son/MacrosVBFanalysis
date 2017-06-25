@@ -285,17 +285,6 @@ void Draw_Numerator_pub(TString HISTO,TString XTITLE,float XMIN,float XMAX,bool 
 
 
   // Set style for MC backgrounds
-  h_Data->SetLineColor(kBlack);
-  h_Bkg_Znunu->SetLineColor(kBlack);
-  h_Bkg_Zll->SetLineColor(kBlack);
-  h_Bkg_Wenu->SetLineColor(kBlack);
-  h_Bkg_Wmunu->SetLineColor(kBlack);
-  h_Bkg_Wtaunu->SetLineColor(kBlack);
-  h_Bkg_Multijet->SetLineColor(kBlack);
-  h_Tot_Sys_nominal->SetLineColor(kBlack);
-  h_Tot_Sys_up->SetLineColor(kBlack);
-  h_Tot_Sys_down->SetLineColor(kBlack);
-
   h_Bkg_Znunu->SetFillColor(kRed-7);
   h_Bkg_Zll->SetFillColor(kOrange+1);
   h_Bkg_Wenu->SetFillColor(kCyan+1);
@@ -305,6 +294,18 @@ void Draw_Numerator_pub(TString HISTO,TString XTITLE,float XMIN,float XMAX,bool 
   //h_Bkg_Ztautau->SetFillColor(kBlue-3);
   //h_ttbar->SetFillColor(kGreen+2);
   //h_Diboson->SetFillColor(kMagenta+1);
+
+  h_Data->SetLineColor(kBlack);
+  h_Bkg_Znunu->SetLineColor(h_Bkg_Znunu->GetFillColor());
+  h_Bkg_Zll->SetLineColor(h_Bkg_Zll->GetFillColor());
+  h_Bkg_Wenu->SetLineColor(h_Bkg_Wenu->GetFillColor());
+  h_Bkg_Wmunu->SetLineColor(h_Bkg_Wmunu->GetFillColor());
+  h_Bkg_Wtaunu->SetLineColor(h_Bkg_Wtaunu->GetFillColor());
+  h_Bkg_Multijet->SetLineColor(h_Bkg_Multijet->GetFillColor());
+  h_Tot_Sys_nominal->SetLineColor(kBlack);
+  h_Tot_Sys_up->SetLineColor(kBlack);
+  h_Tot_Sys_down->SetLineColor(kBlack);
+
 
 
 
@@ -372,11 +373,16 @@ void Draw_Numerator_pub(TString HISTO,TString XTITLE,float XMIN,float XMAX,bool 
   h_total_sys->SetFillColor(kBlack);
   h_total_sys->SetFillStyle(3004);
   h_total_sys->SetMarkerSize(0);
+  h_total_sys->SetMarkerStyle(21);
+  h_total_sys->SetLineColor(kWhite);
+
 
   // Set style for h_total_sys_frac
   h_total_sys_frac->SetFillColor(kBlack);
   h_total_sys_frac->SetFillStyle(3004);
   h_total_sys_frac->SetMarkerSize(0);
+  h_total_sys_frac->SetMarkerStyle(21);
+  h_total_sys_frac->SetLineColor(kWhite);
 
 
 
@@ -447,7 +453,7 @@ void Draw_Numerator_pub(TString HISTO,TString XTITLE,float XMIN,float XMAX,bool 
   h_aux->SetMaximum(ymax);
   h_aux->Draw();
   h_stackSM->Draw("same hist");
-  h_Data->Draw("same E");
+  h_Data->Draw("same E X0");
   h_total_sys->Draw("same E2");
 
   if (ATLAS) {
@@ -455,16 +461,16 @@ void Draw_Numerator_pub(TString HISTO,TString XTITLE,float XMIN,float XMAX,bool 
       myText( 0.30, 0.79, 1, "#scale[0.8]{#sqrt{s} = 13 TeV,}");
       myText( 0.45, 0.79, 1, "#scale[0.8]{"+intLumi+"}");
       myText( 0.31, 0.74, 1, "#scale[0.8]{"+channel+"}");
-      //ATLASLabel(0.30,0.84,"Internal");
+      ATLASLabel(0.30,0.84,"Internal");
       //ATLASLabel(0.30,0.84,"Preliminary");
-      ATLASLabel(0.30,0.84,"");
+      //ATLASLabel(0.30,0.84,"");
     } else {
       myText( 0.40, 0.79, 1, "#scale[0.8]{#sqrt{s} = 13 TeV,}");
       myText( 0.55, 0.79, 1, "#scale[0.8]{"+intLumi+"}");
       myText( 0.40, 0.74, 1, "#scale[0.8]{"+channel+"}");
-      //ATLASLabel(0.40,0.84,"Internal");
+      ATLASLabel(0.40,0.84,"Internal");
       //ATLASLabel(0.40,0.84,"Preliminary");
-      ATLASLabel(0.40,0.84,"");
+      //ATLASLabel(0.40,0.84,"");
     }
   }
 
@@ -521,7 +527,7 @@ void Draw_Numerator_pub(TString HISTO,TString XTITLE,float XMIN,float XMAX,bool 
   h_Ratio->GetXaxis()->SetNdivisions(XDIV);
   h_Ratio->GetYaxis()->CenterTitle(kTRUE);
   h_Ratio->GetXaxis()->SetRangeUser(XMIN,XMAX);
-  h_Ratio->Draw();
+  h_Ratio->Draw("E X0");
   h_total_sys_frac->Draw("same E2");
 
 

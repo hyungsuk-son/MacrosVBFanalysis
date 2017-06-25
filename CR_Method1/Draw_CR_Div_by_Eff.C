@@ -205,24 +205,24 @@ void Draw_CR_Div_by_Eff(TString HISTO,TString XTITLE,float XMIN,float XMAX,bool 
 
 
   // Set style for MC backgrounds
-  h_Data->SetLineColor(kBlack);
-  h_SM->SetLineColor(kBlack);
-  h_Wlepnu->SetLineColor(kBlack);
-  h_WlepnuEWK->SetLineColor(kBlack);
-  h_Wtaunu->SetLineColor(kBlack);
-  h_WtaunuEWK->SetLineColor(kBlack);
-  h_Top->SetLineColor(kBlack);
-  h_Diboson->SetLineColor(kBlack);
-
-  //h_Bkg_Wlepnu->SetFillColor(kRed-3);
+ //h_Bkg_Wlepnu->SetFillColor(kRed-3);
   h_Wlepnu->SetFillColor(kBlue-6);
   h_WlepnuEWK->SetFillColor(kGreen-3);
   h_Wtaunu->SetFillColor(kRed-7);
   h_WtaunuEWK->SetFillColor(kYellow-9);
-  h_Diboson->SetFillColor(kMagenta-7);
   h_Top->SetFillColor(kGray);
+  h_Diboson->SetFillColor(kMagenta-7);
 
+  h_Data->SetLineColor(kBlack);
+  h_SM->SetLineColor(kBlack);
+  h_Wlepnu->SetLineColor(h_Wlepnu->GetFillColor());
+  h_WlepnuEWK->SetLineColor(h_WlepnuEWK->GetFillColor());
+  h_Wtaunu->SetLineColor(h_Wtaunu->GetFillColor());
+  h_WtaunuEWK->SetLineColor(h_WtaunuEWK->GetFillColor());
+  h_Top->SetLineColor(h_Top->GetFillColor());
+  h_Diboson->SetLineColor(h_Diboson->GetFillColor());
 
+ 
 
   // Fill Stack
   h_stackSM->Add(h_WtaunuEWK);
@@ -302,29 +302,29 @@ void Draw_CR_Div_by_Eff(TString HISTO,TString XTITLE,float XMIN,float XMAX,bool 
   h_aux->SetMaximum(ymax);
   h_aux->Draw();
   h_stackSM->Draw("same hist");
-  h_Data->Draw("same E");
+  h_Data->Draw("same E X0");
 
   if (ATLAS) {
     if (LOGY){
       myText( 0.30, 0.79, 1, "#scale[0.8]{#sqrt{s} = 13 TeV,}");
       myText( 0.45, 0.79, 1, "#scale[0.8]{"+intLumi+"}");
       myText( 0.31, 0.74, 1, "#scale[0.8]{"+channel+"}");
-      //ATLASLabel(0.30,0.84,"Internal");
+      ATLASLabel(0.30,0.84,"Internal");
       //ATLASLabel(0.30,0.84,"Preliminary");
-      ATLASLabel(0.30,0.84,"");
+      //ATLASLabel(0.30,0.84,"");
     } else {
       myText( 0.40, 0.79, 1, "#scale[0.8]{#sqrt{s} = 13 TeV,}");
       myText( 0.55, 0.79, 1, "#scale[0.8]{"+intLumi+"}");
       myText( 0.40, 0.74, 1, "#scale[0.8]{"+channel+"}");
-      //ATLASLabel(0.40,0.84,"Internal");
+      ATLASLabel(0.40,0.84,"Internal");
       //ATLASLabel(0.40,0.84,"Preliminary");
-      ATLASLabel(0.40,0.84,"");
+      //ATLASLabel(0.40,0.84,"");
     }
   }
 
   TLegend *leg;
   if (LOGY){
-    leg = new TLegend(0.65,0.60,0.90,0.86);
+    leg = new TLegend(0.62,0.62,0.90,0.86);
   } else {
     leg = new TLegend(0.13,0.60,0.38,0.86);
   }
@@ -340,17 +340,21 @@ void Draw_CR_Div_by_Eff(TString HISTO,TString XTITLE,float XMIN,float XMAX,bool 
   leg->SetBorderSize(0);
   leg->AddEntry(h_Data,"Data 2015","P");
   if ( HISTO.Contains("Muon") ) {
-    leg->AddEntry(h_Wlepnu,"W #rightarrow #mu#nu","F");
-    leg->AddEntry(h_WlepnuEWK,"EWK W #rightarrow #mu#nu","F");
+    leg->AddEntry(h_Wlepnu,"W(#rightarrow #mu#nu)+jets","F");
   }
   if ( HISTO.Contains("Electron") ) {
-    leg->AddEntry(h_Wlepnu,"W #rightarrow e#nu","F");
-    leg->AddEntry(h_WlepnuEWK,"EWK W #rightarrow e#nu","F");
+    leg->AddEntry(h_Wlepnu,"W(#rightarrow e#nu)+jets","F");
   }
-  leg->AddEntry(h_Wtaunu,"W #rightarrow #tau#nu","F");
-  leg->AddEntry(h_WtaunuEWK,"EWK W #rightarrow #tau#nu","F");
-  leg->AddEntry(h_Top,"Top","F");
+  leg->AddEntry(h_Top,"t#bar{t} (+X) + single top","F");
+  leg->AddEntry(h_Wtaunu,"W(#rightarrow #tau#nu)+jets","F");
+  if ( HISTO.Contains("Muon") ) {
+    leg->AddEntry(h_WlepnuEWK,"EWK W(#rightarrow #mu#nu)+jets","F");
+  }
+  if ( HISTO.Contains("Electron") ) {
+    leg->AddEntry(h_WlepnuEWK,"EWK W(#rightarrow e#nu)+jets","F");
+  }
   leg->AddEntry(h_Diboson,"Diboson","F");
+  leg->AddEntry(h_WtaunuEWK,"EWK W(#rightarrow #tau#nu)+jets","F");
   
   leg->Draw();
   gPad->RedrawAxis();
@@ -381,7 +385,7 @@ void Draw_CR_Div_by_Eff(TString HISTO,TString XTITLE,float XMIN,float XMAX,bool 
   h_Ratio->GetXaxis()->SetNdivisions(XDIV);
   h_Ratio->GetYaxis()->CenterTitle(kTRUE);
   h_Ratio->GetXaxis()->SetRangeUser(XMIN,XMAX);
-  h_Ratio->Draw();
+  h_Ratio->Draw("E X0");
 
 
 

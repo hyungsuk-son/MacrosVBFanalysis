@@ -794,17 +794,6 @@ void Draw_Data_MC_with_Sys(TString HISTO,TString XTITLE,float XMIN,float XMAX,bo
 
 
   // Set style for MC backgrounds
-  h_Multijet->SetLineColor(kBlack);
-  h_Znunu->SetLineColor(kBlack);
-  h_Wenu->SetLineColor(kBlack);
-  h_Wmunu->SetLineColor(kBlack);
-  h_Wtaunu->SetLineColor(kBlack);
-  h_Zee->SetLineColor(kBlack);
-  h_Zmumu->SetLineColor(kBlack);
-  h_Ztautau->SetLineColor(kBlack);
-  h_ttbar->SetLineColor(kBlack);
-  h_Diboson->SetLineColor(kBlack);
-
   h_Multijet->SetFillColor(kGray);
   h_Znunu->SetFillColor(kRed-7);
   h_Wenu->SetFillColor(kCyan+1);
@@ -816,16 +805,27 @@ void Draw_Data_MC_with_Sys(TString HISTO,TString XTITLE,float XMIN,float XMAX,bo
   h_ttbar->SetFillColor(kGreen+2);
   h_Diboson->SetFillColor(kMagenta+1);
 
+  h_Multijet->SetLineColor(h_Multijet->GetFillColor());
+  h_Znunu->SetLineColor(h_Znunu->GetFillColor());
+  h_Wenu->SetLineColor(h_Wenu->GetFillColor());
+  h_Wmunu->SetLineColor(h_Wmunu->GetFillColor());
+  h_Wtaunu->SetLineColor(h_Wtaunu->GetFillColor());
+  h_Zee->SetLineColor(h_Zee->GetFillColor());
+  h_Zmumu->SetLineColor(h_Zmumu->GetFillColor());
+  h_Ztautau->SetLineColor(h_Ztautau->GetFillColor());
+  h_ttbar->SetLineColor(h_ttbar->GetFillColor());
+  h_Diboson->SetLineColor(h_Diboson->GetFillColor());
+
   // For Zll
   if ( HISTO.Contains("zll") ){
-    h_Zll->SetLineColor(kBlack);
     h_Zll->SetFillColor(kOrange+1);
+    h_Zll->SetLineColor(h_Zll->GetFillColor());
   }
 
   // For Wlnu
   if ( HISTO.Contains("zll") ){
-    h_Wlnu->SetLineColor(kBlack);
     h_Wlnu->SetFillColor(kCyan+1);
+    h_Wlnu->SetLineColor(h_Wlnu->GetFillColor());
   }
 
 
@@ -897,14 +897,18 @@ void Draw_Data_MC_with_Sys(TString HISTO,TString XTITLE,float XMIN,float XMAX,bo
 
   // Calculate the total systematic uncertainty from all systematics sources
   // Tot_sys_error = Sqrt( max( abs(sys1_up - nominal) ,abs(sys1_down - nominal))^2 + max( abs(sys2_up - nominal) ,abs(sys2_down - nominal))^2 + ... )  where sys1_up is the ratio of sys1_up to nominal
-  TH1F *h_total_sys = (TH1F*)h_background_sys[""]->Clone("h_total_sys");
-  h_total_sys->SetLineColor(kBlack);
+  TH1F *h_total_sys;
+  h_total_sys  = (TH1F*)h_background_sys[""]->Clone("h_total_sys");
+  if (TopReweight) { // Use Top reweighted h_SM histogram for total_sys histogram. Since systematic histogram has not each background individually, top background can not be reweighted.
+  h_total_sys->Reset();
+  h_total_sys = (TH1F*)h_SM->Clone("h_total_sys");
+  }
+
 
   // Calculate the total fraction uncertainty from all systematics sources (add it to the ratio)
   // Tot_sys_frac = Sqrt( max( abs(sys1_up - nominal) ,sys1_down - nominal)^2 + max( abs(sys2_up - nominal) ,sys2_down - nominal)^2 + ... ) / nominal  , where sys1_up is the ratio of sys1_up to nominal
   TH1F *h_total_sys_frac = (TH1F*)h_background_sys[""]->Clone("h_total_sys_frac");
   h_total_sys_frac->Reset();
-  h_total_sys_frac->SetLineColor(kBlack);
 
 
   for (int binno = 0; binno < h_background_sys[""]->GetNbinsX() + 2; ++binno) {
@@ -987,11 +991,15 @@ void Draw_Data_MC_with_Sys(TString HISTO,TString XTITLE,float XMIN,float XMAX,bo
   h_total_sys->SetFillColor(kBlack);
   h_total_sys->SetFillStyle(3004);
   h_total_sys->SetMarkerSize(0);
+  h_total_sys->SetMarkerStyle(21);
+  h_total_sys->SetLineColor(kWhite);
 
   // Set style for h_total_sys_frac
   h_total_sys_frac->SetFillColor(kBlack);
   h_total_sys_frac->SetFillStyle(3004);
   h_total_sys_frac->SetMarkerSize(0);
+  h_total_sys->SetMarkerStyle(21);
+  h_total_sys_frac->SetLineColor(kWhite);
 
 
 
@@ -1067,7 +1075,7 @@ void Draw_Data_MC_with_Sys(TString HISTO,TString XTITLE,float XMIN,float XMAX,bo
   h_aux->SetMaximum(ymax);
   h_aux->Draw();
   h_stackSM->Draw("same hist");
-  h_Data->Draw("same E");
+  h_Data->Draw("same E X0");
   h_total_sys->Draw("same E2");
 
   if (ATLAS) {
@@ -1075,16 +1083,16 @@ void Draw_Data_MC_with_Sys(TString HISTO,TString XTITLE,float XMIN,float XMAX,bo
       myText( 0.33, 0.79, 1, "#scale[0.8]{#sqrt{s} = 13 TeV,}");
       myText( 0.48, 0.79, 1, "#scale[0.8]{"+intLumi+"}");
       myText( 0.33, 0.74, 1, "#scale[0.8]{"+channel+"}");
-      //ATLASLabel(0.33,0.84,"Internal");
+      ATLASLabel(0.33,0.84,"Internal");
       //ATLASLabel(0.33,0.84,"Preliminary");
-      ATLASLabel(0.33,0.84,"");
+      //ATLASLabel(0.33,0.84,"");
     } else {
       myText( 0.38, 0.79, 1, "#scale[0.8]{#sqrt{s} = 13 TeV,}");
       myText( 0.53, 0.79, 1, "#scale[0.8]{"+intLumi+"}");
       myText( 0.38, 0.74, 1, "#scale[0.8]{"+channel+"}");
-      //ATLASLabel(0.38,0.84,"Internal");
+      ATLASLabel(0.38,0.84,"Internal");
       //ATLASLabel(0.38,0.84,"Preliminary");
-      ATLASLabel(0.38,0.84,"");
+      //ATLASLabel(0.38,0.84,"");
     }
   }
 
@@ -1167,7 +1175,7 @@ void Draw_Data_MC_with_Sys(TString HISTO,TString XTITLE,float XMIN,float XMAX,bo
   h_Ratio->GetXaxis()->SetNdivisions(XDIV);
   h_Ratio->GetYaxis()->CenterTitle(kTRUE);
   h_Ratio->GetXaxis()->SetRangeUser(XMIN,XMAX);
-  h_Ratio->Draw();
+  h_Ratio->Draw("E X0");
   h_total_sys_frac->Draw("same E2");
 
 

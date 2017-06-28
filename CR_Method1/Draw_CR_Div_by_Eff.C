@@ -56,14 +56,14 @@ void Draw_CR_Div_by_Eff(TString HISTO,TString XTITLE,float XMIN,float XMAX,bool 
     if ( HISTO.Contains("PseudoMET") ) {
       channel = "W#rightarrow#mu#nu #geq1 jet"; //Wmunu monojet
     } else {
-      channel = "W#rightarrow#mu#nu VBF"; //Wmunu VBF
+      channel = "W#rightarrow#mu#nu + jets (VBF)"; //Wmunu VBF
     }
   }
   if ( HISTO.Contains("Electron") ) {
     if ( HISTO.Contains("PseudoMET") ) {
       channel = "W#rightarrowe#nu #geq1 jet"; //Wenu monojet
     } else {
-      channel = "W#rightarrowe#nu VBF"; //Wenu VBF
+      channel = "W#rightarrowe#nu + jets (VBF)"; //Wenu VBF
     }
   }
 
@@ -240,11 +240,25 @@ void Draw_CR_Div_by_Eff(TString HISTO,TString XTITLE,float XMIN,float XMAX,bool 
   gStyle->SetOptTitle(0);
 
 
-  // Draw Data/MC Comparison plots
+  ////////////////////////////////////
+  // Draw Data/MC Comparison plots //
+  ////////////////////////////////////
+
+  // Set all font size and offset in the plot
+  Float_t axis_title_size = 0.040; // x, y axis title size
+  Float_t axis_label_size = 0.032; // x, y axis lable size (x,y values)
+  Float_t Xaxis_title_offset = 1.2; // distance of x axis title from the plot
+  Float_t Yaxis_title_offset = 1.6; // distance of y axis title from the plot
+  Float_t legend_text_size = 0.030; // legend text size
+
+  // Create Canvas
   TCanvas *can = new TCanvas("can_"+HISTO,"can_"+HISTO,700,600);
   can->cd(1);
-  can->SetBottomMargin(0.3);
-  //can->SetRightMargin(0.2);
+  can->SetTopMargin(0.06);
+  can->SetBottomMargin(0.34);
+  can->SetLeftMargin(0.14);
+  can->SetRightMargin(0.06);
+
   if (LOGY) gPad->SetLogy();
   TH1F *h_aux = (TH1F*)h_SM->Clone("aux");
   h_aux->Reset();
@@ -278,9 +292,9 @@ void Draw_CR_Div_by_Eff(TString HISTO,TString XTITLE,float XMIN,float XMAX,bool 
   //h_aux->GetXaxis()->SetTitle(XTITLE);
   h_aux->GetXaxis()->SetTitleSize(0.0);
   h_aux->GetXaxis()->SetLabelSize(0.0);
-  h_aux->GetYaxis()->SetTitleSize(0.035);
-  h_aux->GetYaxis()->SetLabelSize(0.030);
-  h_aux->GetYaxis()->SetTitleOffset(1.4);
+  h_aux->GetYaxis()->SetTitleSize(axis_title_size);
+  h_aux->GetYaxis()->SetLabelSize(axis_label_size);
+  h_aux->GetYaxis()->SetTitleOffset(Yaxis_title_offset);
   h_aux->GetYaxis()->SetNdivisions(505);
   h_aux->GetXaxis()->SetNdivisions(XDIV);
   h_aux->GetXaxis()->SetRangeUser(XMIN,XMAX);
@@ -306,17 +320,17 @@ void Draw_CR_Div_by_Eff(TString HISTO,TString XTITLE,float XMIN,float XMAX,bool 
 
   if (ATLAS) {
     if (LOGY){
-      myText( 0.30, 0.79, 1, "#scale[0.8]{#sqrt{s} = 13 TeV,}");
-      myText( 0.45, 0.79, 1, "#scale[0.8]{"+intLumi+"}");
-      myText( 0.31, 0.74, 1, "#scale[0.8]{"+channel+"}");
-      ATLASLabel(0.30,0.84,"Internal");
+      myText( 0.39, 0.83, 1, "#scale[0.8]{#sqrt{s} = 13 TeV,}");
+      myText( 0.54, 0.83, 1, "#scale[0.8]{"+intLumi+"}");
+      myText( 0.39, 0.79, 1, "#scale[0.8]{"+channel+"}");
+      ATLASLabel(0.39,0.87,"Internal");
       //ATLASLabel(0.30,0.84,"Preliminary");
       //ATLASLabel(0.30,0.84,"");
     } else {
-      myText( 0.40, 0.79, 1, "#scale[0.8]{#sqrt{s} = 13 TeV,}");
-      myText( 0.55, 0.79, 1, "#scale[0.8]{"+intLumi+"}");
-      myText( 0.40, 0.74, 1, "#scale[0.8]{"+channel+"}");
-      ATLASLabel(0.40,0.84,"Internal");
+      myText( 0.43, 0.83, 1, "#scale[0.8]{#sqrt{s} = 13 TeV,}");
+      myText( 0.58, 0.83, 1, "#scale[0.8]{"+intLumi+"}");
+      myText( 0.43, 0.79, 1, "#scale[0.8]{"+channel+"}");
+      ATLASLabel(0.43,0.87,"Internal");
       //ATLASLabel(0.40,0.84,"Preliminary");
       //ATLASLabel(0.40,0.84,"");
     }
@@ -324,9 +338,9 @@ void Draw_CR_Div_by_Eff(TString HISTO,TString XTITLE,float XMIN,float XMAX,bool 
 
   TLegend *leg;
   if (LOGY){
-    leg = new TLegend(0.62,0.62,0.90,0.86);
+    leg = new TLegend(0.64,0.64,0.90,0.90);
   } else {
-    leg = new TLegend(0.13,0.60,0.38,0.86);
+    leg = new TLegend(0.16,0.63,0.42,0.90);
   }
   //leg->SetHeader("Presel. & Trigger");
 
@@ -336,7 +350,7 @@ void Draw_CR_Div_by_Eff(TString HISTO,TString XTITLE,float XMIN,float XMAX,bool 
   leg->SetFillStyle(0);
   leg->SetFillColor(0);
   leg->SetTextFont(42);
-  leg->SetTextSize(0.028);
+  leg->SetTextSize(legend_text_size);
   leg->SetBorderSize(0);
   leg->AddEntry(h_Data,"Data 2015","P");
   if ( HISTO.Contains("Muon") ) {
@@ -359,8 +373,10 @@ void Draw_CR_Div_by_Eff(TString HISTO,TString XTITLE,float XMIN,float XMAX,bool 
   leg->Draw();
   gPad->RedrawAxis();
   TPad* pad = new TPad("pad", "pad", 0., 0., 1., 1.);
-  pad->SetTopMargin(0.72);
-  //pad->SetRightMargin(0.2);
+  pad->SetTopMargin(0.68);
+  pad->SetBottomMargin(0.14);
+  pad->SetLeftMargin(0.14);
+  pad->SetRightMargin(0.06);
   pad->SetFillColor(0);
   pad->SetFillStyle(0);
   pad->Draw();
@@ -377,11 +393,12 @@ void Draw_CR_Div_by_Eff(TString HISTO,TString XTITLE,float XMIN,float XMAX,bool 
   }
   h_Ratio->GetYaxis()->SetNdivisions(505);
   h_Ratio->GetYaxis()->SetTickLength(0.06);
-  h_Ratio->GetXaxis()->SetTitleSize(0.040);
-  h_Ratio->GetXaxis()->SetLabelSize(0.030);
-  h_Ratio->GetYaxis()->SetTitleSize(0.035);
-  h_Ratio->GetYaxis()->SetLabelSize(0.030);
-  h_Ratio->GetYaxis()->SetTitleOffset(1.4);
+  h_Ratio->GetXaxis()->SetTitleSize(axis_title_size);
+  h_Ratio->GetXaxis()->SetLabelSize(axis_label_size);
+  h_Ratio->GetXaxis()->SetTitleOffset(Xaxis_title_offset);
+  h_Ratio->GetYaxis()->SetTitleSize(axis_title_size);
+  h_Ratio->GetYaxis()->SetLabelSize(axis_label_size);
+  h_Ratio->GetYaxis()->SetTitleOffset(Yaxis_title_offset);
   h_Ratio->GetXaxis()->SetNdivisions(XDIV);
   h_Ratio->GetYaxis()->CenterTitle(kTRUE);
   h_Ratio->GetXaxis()->SetRangeUser(XMIN,XMAX);

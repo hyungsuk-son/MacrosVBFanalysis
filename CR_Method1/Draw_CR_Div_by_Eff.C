@@ -31,7 +31,7 @@
 //#endif
 
 
-void Draw_CR_Div_by_Eff(TString HISTO,TString XTITLE,float XMIN,float XMAX,bool REBIN,bool LOGY,bool PRINT,int XDIV,TString UNITS,bool ATLAS,bool DivBinWidth)
+void Draw_CR_Div_by_Eff(TString HISTO,TString XTITLE,float XMIN,float XMAX,bool REBIN,bool LOGY,bool PRINT,int XDIV,TString UNITS,bool ATLAS,bool DivBinWidth,bool Group_EWK_QCD)
 {
   gROOT->ForceStyle();
 
@@ -165,6 +165,16 @@ void Draw_CR_Div_by_Eff(TString HISTO,TString XTITLE,float XMIN,float XMAX,bool 
   }
 
 
+  ////////////////////////////////////////////////////
+  // Group the electroweak stuff with the QCD stuff //
+  ////////////////////////////////////////////////////
+  if (Group_EWK_QCD){
+    h_Wlepnu->Add(h_WlepnuEWK);
+    h_Wtaunu->Add(h_WtaunuEWK);
+  }
+
+
+
 
   // Define Stack
   THStack *h_stackSM = new THStack("sm","sm");
@@ -211,7 +221,10 @@ void Draw_CR_Div_by_Eff(TString HISTO,TString XTITLE,float XMIN,float XMAX,bool 
   h_Wtaunu->SetFillColor(kRed-7);
   h_WtaunuEWK->SetFillColor(kYellow-9);
   h_Top->SetFillColor(kGray);
-  h_Diboson->SetFillColor(kMagenta-7);
+  if (!Group_EWK_QCD){
+    h_Diboson->SetFillColor(kMagenta-7);
+  } else
+    h_Diboson->SetFillColor(kGreen-3);
 
   h_Data->SetLineColor(kBlack);
   h_SM->SetLineColor(kBlack);
@@ -222,12 +235,16 @@ void Draw_CR_Div_by_Eff(TString HISTO,TString XTITLE,float XMIN,float XMAX,bool 
   h_Top->SetLineColor(h_Top->GetFillColor());
   h_Diboson->SetLineColor(h_Diboson->GetFillColor());
 
- 
+
 
   // Fill Stack
-  h_stackSM->Add(h_WtaunuEWK);
+  if (!Group_EWK_QCD){
+    h_stackSM->Add(h_WtaunuEWK);
+  }
   h_stackSM->Add(h_Diboson);
-  h_stackSM->Add(h_WlepnuEWK);
+  if (!Group_EWK_QCD){
+    h_stackSM->Add(h_WlepnuEWK);
+  }
   h_stackSM->Add(h_Wtaunu);
   h_stackSM->Add(h_Top);
   h_stackSM->Add(h_Wlepnu);
@@ -361,15 +378,17 @@ void Draw_CR_Div_by_Eff(TString HISTO,TString XTITLE,float XMIN,float XMAX,bool 
   }
   leg->AddEntry(h_Top,"t#bar{t} (+X) + single top","F");
   leg->AddEntry(h_Wtaunu,"W(#rightarrow #tau#nu)+jets","F");
-  if ( HISTO.Contains("Muon") ) {
+  if ( HISTO.Contains("Muon") && !Group_EWK_QCD ) {
     leg->AddEntry(h_WlepnuEWK,"EWK W(#rightarrow #mu#nu)+jets","F");
   }
-  if ( HISTO.Contains("Electron") ) {
+  if ( HISTO.Contains("Electron") && !Group_EWK_QCD ) {
     leg->AddEntry(h_WlepnuEWK,"EWK W(#rightarrow e#nu)+jets","F");
   }
   leg->AddEntry(h_Diboson,"Diboson","F");
-  leg->AddEntry(h_WtaunuEWK,"EWK W(#rightarrow #tau#nu)+jets","F");
-  
+  if ( HISTO.Contains("Electron") && !Group_EWK_QCD ) {
+    leg->AddEntry(h_WtaunuEWK,"EWK W(#rightarrow #tau#nu)+jets","F");
+  }
+
   leg->Draw();
   gPad->RedrawAxis();
   TPad* pad = new TPad("pad", "pad", 0., 0., 1., 1.);

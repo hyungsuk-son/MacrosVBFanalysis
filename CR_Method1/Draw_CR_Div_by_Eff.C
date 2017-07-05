@@ -182,14 +182,16 @@ void Draw_CR_Div_by_Eff(TString HISTO,TString XTITLE,float XMIN,float XMAX,bool 
 
   // Set Style for Data
   h_Data->SetMarkerStyle(kFullCircle);
-  h_Data->SetMarkerSize(0.8);
+  h_Data->SetMarkerSize(1.0);
   h_Data->SetLineColor(kBlack);
+  h_Data->SetLineWidth(2.0);
 
   // Ratio of Data/MC
   TH1F *h_Ratio = (TH1F*)h_Data->Clone("Ratio");
   h_Ratio->Divide( (TH1F*)h_SM ); // Divided by Total Bkg (Data/MC)
   h_Ratio->SetMarkerStyle(kFullCircle);
-  h_Ratio->SetMarkerSize(0.8);
+  h_Ratio->SetMarkerSize(1.0);
+  h_Ratio->SetLineWidth(2.0);
 
   // Set errors for ratio (Data/MC)
   // Assuming uncorrelated errors, the formula for the error on a ratio (x/y) is
@@ -262,7 +264,8 @@ void Draw_CR_Div_by_Eff(TString HISTO,TString XTITLE,float XMIN,float XMAX,bool 
   ////////////////////////////////////
 
   // Set all font size and offset in the plot
-  Float_t axis_title_size = 0.040; // x, y axis title size
+  Float_t xAxis_title_size = 0.045; // x axis title size
+  Float_t yAxis_title_size = 0.040; // y axis title size
   Float_t axis_label_size = 0.032; // x, y axis lable size (x,y values)
   Float_t Xaxis_title_offset = 1.2; // distance of x axis title from the plot
   Float_t Yaxis_title_offset = 1.6; // distance of y axis title from the plot
@@ -309,7 +312,7 @@ void Draw_CR_Div_by_Eff(TString HISTO,TString XTITLE,float XMIN,float XMAX,bool 
   //h_aux->GetXaxis()->SetTitle(XTITLE);
   h_aux->GetXaxis()->SetTitleSize(0.0);
   h_aux->GetXaxis()->SetLabelSize(0.0);
-  h_aux->GetYaxis()->SetTitleSize(axis_title_size);
+  h_aux->GetYaxis()->SetTitleSize(yAxis_title_size);
   h_aux->GetYaxis()->SetLabelSize(axis_label_size);
   h_aux->GetYaxis()->SetTitleOffset(Yaxis_title_offset);
   h_aux->GetYaxis()->SetNdivisions(505);
@@ -340,16 +343,16 @@ void Draw_CR_Div_by_Eff(TString HISTO,TString XTITLE,float XMIN,float XMAX,bool 
       myText( 0.39, 0.83, 1, "#scale[0.8]{#sqrt{s} = 13 TeV,}");
       myText( 0.54, 0.83, 1, "#scale[0.8]{"+intLumi+"}");
       myText( 0.39, 0.79, 1, "#scale[0.8]{"+channel+"}");
-      ATLASLabel(0.39,0.87,"Internal");
-      //ATLASLabel(0.30,0.84,"Preliminary");
-      //ATLASLabel(0.30,0.84,"");
+      //ATLASLabel(0.39,0.87,"Internal");
+      //ATLASLabel(0.39,0.87,"Preliminary");
+      ATLASLabel(0.39,0.87,"");
     } else {
       myText( 0.43, 0.83, 1, "#scale[0.8]{#sqrt{s} = 13 TeV,}");
       myText( 0.58, 0.83, 1, "#scale[0.8]{"+intLumi+"}");
       myText( 0.43, 0.79, 1, "#scale[0.8]{"+channel+"}");
-      ATLASLabel(0.43,0.87,"Internal");
-      //ATLASLabel(0.40,0.84,"Preliminary");
-      //ATLASLabel(0.40,0.84,"");
+      //ATLASLabel(0.43,0.87,"Internal");
+      //ATLASLabel(0.43,0.87,"Preliminary");
+      ATLASLabel(0.43,0.87,"");
     }
   }
 
@@ -412,10 +415,10 @@ void Draw_CR_Div_by_Eff(TString HISTO,TString XTITLE,float XMIN,float XMAX,bool 
   }
   h_Ratio->GetYaxis()->SetNdivisions(505);
   h_Ratio->GetYaxis()->SetTickLength(0.06);
-  h_Ratio->GetXaxis()->SetTitleSize(axis_title_size);
+  h_Ratio->GetXaxis()->SetTitleSize(xAxis_title_size);
   h_Ratio->GetXaxis()->SetLabelSize(axis_label_size);
   h_Ratio->GetXaxis()->SetTitleOffset(Xaxis_title_offset);
-  h_Ratio->GetYaxis()->SetTitleSize(axis_title_size);
+  h_Ratio->GetYaxis()->SetTitleSize(yAxis_title_size);
   h_Ratio->GetYaxis()->SetLabelSize(axis_label_size);
   h_Ratio->GetYaxis()->SetTitleOffset(Yaxis_title_offset);
   h_Ratio->GetXaxis()->SetNdivisions(XDIV);
